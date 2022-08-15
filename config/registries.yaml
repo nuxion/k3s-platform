@@ -1,0 +1,10 @@
+mirrors:
+  registry.local:
+    endpoint:
+      - "http://registry.local:5000"
+#configs:
+#	"registry.local:5000":
+#		tls:
+#			insecure_skip_verify: true
+
+
