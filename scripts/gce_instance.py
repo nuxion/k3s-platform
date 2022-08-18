@@ -7,18 +7,31 @@ import re
 import shlex
 import subprocess
 import sys
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
 from typing import Optional
 
-INSTALLER_DIR = pathlib.Path("/opt/labagent-installer/")
-INSTALLER_DIR.mkdir(parents=True, exist_ok=True)
+LOG_DIR = pathlib.Path("/tmp/gce")
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+
+@dataclass
+class Machine:
+    name: str
+    project: str
+    machine: str
+    disk_size: str
+    image: str
+    network: str
+    tags: str
+    zone: str
 
 
 class Logger:
-    STDOUT_LOG = INSTALLER_DIR / "out.log"
+    STDOUT_LOG = LOG_DIR / "out.log"
     STDOUT_LOG_F = None
-    STDERR_LOG = INSTALLER_DIR / "err.log"
+    STDERR_LOG = LOG_DIR / "err.log"
     STDERR_LOG_F = None
 
     @classmethod
@@ -114,6 +127,21 @@ def check_python_version():
     )
 
 
+def create_instance(m: Machine):
+
+    CMD_CREATE = (
+        f"gcloud compute instances create {m.name} --project={m.project} "
+        f"--zone={m.zone} "
+        f"--machine-type={m.machine} "
+        f"--network-interface=network-tier=PREMIUM,subnet={m.network} "
+        f"--maintenance-policy=MIGRATE --provisioning-model=STANDARD "
+        f"--create-disk=auto-delete=yes,boot=yes,device-name={m.name},image={m.image},mode=rw,size={ m.disk_size },type=projects/{m.project}/zones/{m.zone}/diskTypes/pd-balanced "
+        f" --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring "
+        " --reservation-affinity=any "
+        f"--tags {m.tags}")
+    run(CMD_CREATE, check=True)
+
+
 def parse_args():
     """
     MIRROR = os.getenv("LF_MIRROR")  # with protocol
@@ -123,22 +151,42 @@ def parse_args():
     VERSION = os.getenv("LF_DOCKER_VER")  # version
     """
 
-    parser = argparse.ArgumentParser(description="Prepare node for lab agent")
-    parser.add_argument("action", choices=["create"], default="install", nargs="?")
-    parser.add_argument("--registry", help="registry url without protocol")
-    parser.add_argument("--mirror", help="fullurl of a docker mirror")
-    parser.add_argument(
-        "--image",
-        default="nuxion/labfunctions",
-        help="fullimage name: nuxion/labfunctions",
-    )
-    parser.add_argument(
-        "--version", default="0.9.0-alpha.11", help="tag version of the image"
-    )
-    parser.add_argument("--insecure", help="if the registry has https or not")
-
+    parser = argparse.ArgumentParser(description="Manage gce instance")
+    parser.add_argument("action", choices=[
+                        "create"], default="install", nargs="?")
+    parser.add_argument("--name", help="Machine name")
+    parser.add_argument("--machine", default="e2-small", help="Machine type")
+    parser.add_argument("--project", default="algorinfo99", help="GCE Project")
+    parser.add_argument("--disk-size", default="10",
+                        help="Boot disk size in GB")
+    parser.add_argument("--tags", help="comma separated tags")
+    parser.add_argument("--network", default="default", help="network")
+    parser.add_argument("--zone", default="us-central1-a" , help="network")
+    parser.add_argument("--image", default="projects/debian-cloud/global/images/debian-11-bullseye-v20220719",
+            help="Find one using gcloud compute images list --uri",
+                        )
     args = parser.parse_args()
+    machine = Machine(
+        name=args.name,
+        machine=args.machine,
+        image=args.image,
+        project=args.project,
+        disk_size=args.disk_size,
+        tags=args.tags,
+        network=args.network,
+        zone=args.zone,
+    )
 
     return args
 
 
+def main():
+    Logger.setup_log_dir()
+    check_python_version()
+    args = parse_args()
+    if args.action == "create":
+        create_instance(args)
+
+
+if __name__ == "__main__":
+    main()
