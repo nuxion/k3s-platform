@@ -1,0 +1,11 @@
+title: "GCP K3S object access role"
+description: Custom role for k3s installation
+stage: ALPHA
+includedPermissions:
+- storage.buckets.get
+- storage.objects.create
+- storage.objects.get
+- storage.objects.list
+- storage.objects.update
+
+

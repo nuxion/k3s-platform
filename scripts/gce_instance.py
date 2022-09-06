@@ -26,6 +26,8 @@ class Machine:
     network: str
     tags: str
     zone: str
+    scopes: str
+    sa: str
 
 
 class Logger:
@@ -137,7 +139,9 @@ def create_instance(m: Machine):
         f"--maintenance-policy=MIGRATE --provisioning-model=STANDARD "
         f"--create-disk=auto-delete=yes,boot=yes,device-name={m.name},image={m.image},mode=rw,size={ m.disk_size },type=projects/{m.project}/zones/{m.zone}/diskTypes/pd-balanced "
         f" --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring "
-        " --reservation-affinity=any "
+        "--reservation-affinity=any "
+        f"--service-account {m.sa}@{m.project}.iam.gserviceaccount.com "
+        f"--scopes {m.scopes} "
         f"--tags {m.tags}")
     run(CMD_CREATE, check=True)
 
@@ -161,9 +165,12 @@ def parse_args():
                         help="Boot disk size in GB")
     parser.add_argument("--tags", help="comma separated tags")
     parser.add_argument("--network", default="default", help="network")
-    parser.add_argument("--zone", default="us-central1-a" , help="network")
+    parser.add_argument("--zone", default="us-central1-a", help="network")
+    parser.add_argument("--sa", default=None, help="SA Account")
+    parser.add_argument(
+        "--scopes", default="compute-ro,storage-full", help="Scopes")
     parser.add_argument("--image", default="projects/debian-cloud/global/images/debian-11-bullseye-v20220719",
-            help="Find one using gcloud compute images list --uri",
+                        help="Find one using gcloud compute images list --uri",
                         )
     args = parser.parse_args()
     machine = Machine(
@@ -175,17 +182,19 @@ def parse_args():
         tags=args.tags,
         network=args.network,
         zone=args.zone,
+        scopes=args.scopes,
+        sa=args.sa,
     )
 
-    return args
+    return args, machine
 
 
 def main():
     Logger.setup_log_dir()
     check_python_version()
-    args = parse_args()
+    args, machine = parse_args()
     if args.action == "create":
-        create_instance(args)
+        create_instance(machine)
 
 
 if __name__ == "__main__":

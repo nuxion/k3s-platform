@@ -2,7 +2,7 @@
 
 Used for testing and prototyping
 
-## How to start a local env?
+## Localhost
 
 This project uses [k3d](https://k3d.io/v5.4.4/)
 For installation you can refer to k3d site or use some of the following:
@@ -29,8 +29,19 @@ Finally a cluster should be create. But first, you should review `config/registr
 k3d cluster create --registry-config config/registries.yaml
 ```
 
+# Google Cloud
 
-# Cloud env
+based on the [flyte guide](https://docs.flyte.org/en/latest/deployment/gcp/manual.html#deployment-gcp-manual) between other scripts around kubernetes ecosystem.
+
+First of all a few manual steps are required but some scripts are provided to help you. 
+
+1. A GCE account with a `PROJECT_ID` created. 
+2. A bucket with the following convention: <PROJECT_ID>-infra this bucket will be used for importation sharing beetween control plane and agents
+3. A role and SA Account should be created for K3S installer `scripts/gce_k3s_installer_roles.sh`. This SA account called k3s-installer is used by k3s to put sensible information into the bucket created in the step 2. 
+4. Another role and SA Account should be created for the csi-disk-driver, this will be used by kubernetes to request volumes dynamically to GCE check [storage](/storage/gce/README.md) for more information. 
+
+
+
 
 Define the following env variables:
 
