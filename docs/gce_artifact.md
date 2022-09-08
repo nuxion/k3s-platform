@@ -75,6 +75,7 @@ cat KEY-FILE | docker login -u KEY-TYPE --password-stdin \
 ```
 
 KEY-TYPE depends of format of the account key:
+	
 	- `_json_key` if you are using the service account key in JSON format as it was provided when you created the file.
   - `_json_key_base64` if you base64-encoded the all contents of the file.
 
