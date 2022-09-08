@@ -63,6 +63,7 @@ gcloud auth print-access-token \
 To list repositories available:
 ```
 gcloud artifacts repositories list
+```
 
 ### 2. Service Account
 
