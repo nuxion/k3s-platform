@@ -322,3 +322,4 @@ tags
 .secrets/
 .envrc
 .env.docker
+inventory.ini

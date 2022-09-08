@@ -6,20 +6,6 @@ variable "projectid" {
   description = "general projectid"
   type = string
 }
-variable "state_bucket" {
-  description = "Bucket where TF state will be saved"
-  type = string
-}
-
-variable "state_project" {
-  description = "ProjectID, it should exist in GCP"
-  type = string
-}
-
-variable "state_bucket_prefix" {
-  description = "Prefix to be used for TF to store TF state."
-  type = string
-}
 
 variable "zone" {
   description = "zone"
@@ -32,4 +18,12 @@ variable "region" {
   default = "us-central1"
   type = string
 }
+
+variable "k3s-cloudconfig" {
+  description = "cloud config yaml file"
+  default = "files/k3s-cloud-config.yaml"
+  type = string
+}
+
+
 

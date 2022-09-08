@@ -8,6 +8,22 @@ variable "base_path" {
   type = string
 }
 
+variable "k3s_url" {
+  description = "URLs server of the Kubernetes API server"
+  type = string
+}
+
+variable "tpl_name" {
+  description = "Name of the template"
+  type = string
+}
+
+variable "tpl_description" {
+  description = "Description of the template"
+  type = string
+  default = "Used to create node pools of k3s agents"
+}
+
 variable "dns_name" {
     description = "DNS private zone"
     type = string
@@ -33,13 +49,6 @@ variable "network_tags" {
   default = ["k3s", "default"]
 }
 
-variable "server_name" {
-  description = "hostname for the server"
-  type = string
-  default = "k3s-server"
-
-}
-
 variable "k3s_zone" {
   description = "zone for this server"
   type = string
@@ -62,25 +71,25 @@ variable "cluster_name" {
   default = "default"
 }
 
-variable "server_machine_type" {
+variable "cpu_machine_type" {
   description = "gce type machine"
   type = string
-  default = "e2-medium"
+  default = "e2-small"
 }
 
-variable "server_boot_image" {
+variable "cpu_boot_image" {
   description = "gce type machine"
   type = string
   default = "debian-cloud/debian-11"
 }
 
-variable "server_boot_size" {
+variable "cpu_boot_size" {
   description = "gce size machine"
   type = string
   default = "10"
 }
 
-variable "server_boot_type" {
+variable "cpu_boot_type" {
   description = "gce type machine"
   type = string
   default = "pd-standard"

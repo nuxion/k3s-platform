@@ -86,18 +86,52 @@ resource "google_dns_managed_zone" "infra_zone" {
   ]
 }
 
-module "k3s-server" {
+
+
+module "k3s-cluster" {
   source = "../modules/k3s-server"
-  k3s_server_name = "k3s-server"
+  # general
   base_path = "${var.base_path}"
+  project = "${var.project}"
   k3s_zone = "${var.zone}"
   k3s_location = "${var.location}"
-  k3s_network = google_compute_network.net_prod.self_link
   cluster_name = "${var.cluster_name}"
-  k3s_machine_type = "${var.k3s_machine_type}"
-  k3s_boot_size = "${var.k3s_boot_size}"
-  k3s_boot_type = "${var.k3s_boot_type}"
+  label_env = "prod"
+  # iam
+  k3s_service_account = "k3s-installer"
+  k3s_scopes = ["compute-ro", "storage-full"]
+  # network
+  k3s_network = google_compute_network.net_prod.self_link
   dns_name = "${google_dns_managed_zone.infra_zone.dns_name}"
   dns_zone_name = google_dns_managed_zone.infra_zone.name
+  network_tags = ["k3s", "prod"]
+  # server
+  server_name = "k3s-server"
+  server_machine_type = "${var.k3s_machine_type}"
+  server_boot_size = "${var.k3s_boot_size}"
+  server_boot_type = "${var.k3s_boot_type}"
+  }
+
+
+module "k3s-tpl-agent-small" {
+  source = "../modules/k3s-tpl-agent-cpu"
+  # general
+  base_path = "${var.base_path}"
+  tpl_name = "k3s-tpl-agent-small"
   project = "${var.project}"
-}
+  k3s_zone = "${var.zone}"
+  k3s_location = "${var.location}"
+  cluster_name = "${var.cluster_name}"
+  label_env = "prod"
+  # iam
+  k3s_service_account = "k3s-installer"
+  k3s_scopes = ["compute-ro", "storage-full"]
+  # network
+  k3s_url = "https://${module.k3s-cluster.server_name}.${google_dns_managed_zone.infra_zone.dns_name}:6443"
+  k3s_network = google_compute_network.net_prod.self_link
+  dns_name = "${google_dns_managed_zone.infra_zone.dns_name}"
+  dns_zone_name = google_dns_managed_zone.infra_zone.name
+  network_tags = ["k3s", "prod"]
+  # agent template
+  cpu_machine_type = "e2-small"
+ }

@@ -45,8 +45,9 @@ PROJECT=`echo $META | jq .attributes.project | tr -d '"'`
 LOCATION=`echo $META | jq .attributes.location | tr -d '"'`
 K3S_VERSION=`echo $META | jq .attributes.version | tr -d '"'`
 K3S_NAME=`echo $META | jq .attributes.clustername | tr -d '"'`
-MZONE=`curl -s "http://metadata.google.internal/computeMetadata/v1/instance/zone" -H "Metadata-Flavor: Google"`
-ZONE=`echo ${META} | jq ".zone" | tr "/" "\n" | tail -n 1`
+# MZONE=`curl -s "http://metadata.google.internal/computeMetadata/v1/instance/zone" -H "Metadata-Flavor: Google"`
+# ZONE=`echo ${META} | jq ".zone" | tr "/" "\n" | tail -n 1`
+DNS_NAME=`echo $META | jq .attributes.dnsname | tr -d '"'`
 IPV4=`echo ${META} | jq ".networkInterfaces[0].ip" | tr -d '"'`
 
 
@@ -75,7 +76,7 @@ then
     cat <<EOT > /etc/rancher/k3s/k3s.yaml
 write-kubeconfig-mode: "0640"
 tls-san:
-    - "k3s.${ZONE}.cloud"
+    - "${DNS_NAME}"
     - "${IPV4}"
 node-label:
     - "pool=no"
@@ -87,6 +88,10 @@ EOT
 
     _log "Putting node-token into gs://${PROJECT}-infra/k3s/${LOCATION}/${K3S_NAME}"
     gsutil cp /var/lib/rancher/k3s/server/node-token gs://${PROJECT}-infra/k3s/${LOCATION}/${K3S_NAME}/node-token | tee /dev/fd/3
+
+    cat /etc/rancher/k3s/k3s.yaml | sed "s/127.0.0.1/${DNS_NAME}/g" > /root/k3s.yaml
+    gsutil cp /root/k3s.yaml gs://${PROJECT}-infra/k3s/${LOCATION}/${K3S_NAME}/k3s.yaml | tee /dev/fd/3
+    rm /root/k3s.yaml
 
     wait_kube
     _log "Starting CSI Disk driver installation"
