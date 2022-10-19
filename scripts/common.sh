@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CREDENTIALS="~/.ssh"
+
 ensure_var()
 {
     if [[ -z "${!1:-}" ]];
@@ -10,6 +12,7 @@ ensure_var()
         echo "${1} is ${!1}"
     fi
 }
+
 ensure_role()
 {
     ROLE=$1
