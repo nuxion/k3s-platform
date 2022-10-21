@@ -1,0 +1,11 @@
+title: "DB Manager role"
+description: Custom role for PostgreSQL administration
+stage: BETA
+includedPermissions:
+- storage.buckets.get
+- storage.objects.create
+- storage.objects.get
+- storage.objects.list
+- storage.objects.update
+
+
