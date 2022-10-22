@@ -25,7 +25,14 @@ google_apis(){
     done
 }
 
-google_apis
+# google_apis
+
 source "${BASE_PATH}/scripts/google/packer.sh"
 config_packer
+
+source "${BASE_PATH}/scripts/google/postgres.sh"
+config_postgres
+
+source "${BASE_PATH}/scripts/google/terraform.sh"
+config_terraform
 

@@ -2,7 +2,7 @@
 # docs: https://cloud.google.com/iam/docs/creating-custom-roles#editing_an_existing_custom_role
 
 source "${BASE_PATH}/scripts/common.sh"
-ROLES=("dbmanager")
+ROLES=("dbmanager" "terraform")
 ensure_var PROJECT_ID
 ensure_role()
 {

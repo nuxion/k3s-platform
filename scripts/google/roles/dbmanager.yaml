@@ -3,9 +3,17 @@ description: Custom role for PostgreSQL administration
 stage: BETA
 includedPermissions:
 - storage.buckets.get
+- storage.buckets.list
+- storage.buckets.update
+- storage.buckets.getIamPolicy
+- storage.multipartUploads.abort
+- storage.multipartUploads.create
+- storage.multipartUploads.list
+- storage.multipartUploads.listParts
 - storage.objects.create
 - storage.objects.get
 - storage.objects.list
 - storage.objects.update
+- storage.objects.delete
 
 

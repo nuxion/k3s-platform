@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CREDENTIALS="~/.ssh"
+CREDENTIALS="${HOME}/.ssh"
 
 ensure_var()
 {
