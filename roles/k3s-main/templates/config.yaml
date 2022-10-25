@@ -1,0 +1,6 @@
+# write-kubeconfig-mode: "0644"
+tls-san:
+  - "{{ k3s_tls_san }}"
+node-label:
+  - "foo=bar"
+  - "something=amazing"
