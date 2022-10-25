@@ -1,0 +1,7 @@
+secretGenerator:
+- name: test-secrets
+  envs:
+  - .env.secrets
+resources:
+  - pod-secret.yaml
+

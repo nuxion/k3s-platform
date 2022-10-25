@@ -1,0 +1,85 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pgadmin
+  labels:
+    app: pgadmin
+spec:
+  serviceName: pgadmin
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - image: dpage/pgadmin4:6.15
+          name: pgadmin
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: PGADMIN_DEFAULT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgadmin-secrets
+                  key: password
+            - name: PGADMIN_DEFAULT_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: pgadmin-secrets
+                  key: email
+          ports:
+            - containerPort: 80
+              name: pgadmin-svc
+          volumeMounts:
+            - name: pgadmin-storage
+              mountPath: /var/lib/pgadmin
+      volumes:
+        - name: pgadmin-storage
+          persistentVolumeClaim:
+            claimName: pgadmin-pvc-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgadmin
+  labels:
+    app: pgadmin
+spec:
+  type: ClusterIP
+  # type: NodePort
+  ports:
+   - port: 80
+     # nodePort: 30156
+     targetPort: pgadmin-svc
+  selector:
+   app: pgadmin
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pgadmin
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header X-Script-Name /pgadmin;
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /pgadmin(/|$)(.*)
+          # - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pgadmin
+                port:
+                  number: 80
+
+

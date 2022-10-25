@@ -2,7 +2,7 @@
 
 Used for testing and prototyping
 
-## Localhost
+## Working locally (aka localhost)
 
 This project uses [k3d](https://k3d.io/v5.4.4/)
 For installation you can refer to k3d site or use some of the following:
@@ -27,6 +27,21 @@ Finally a cluster should be create. But first, you should review `config/registr
 
 ```
 k3d cluster create --registry-config config/registries.yaml
+```
+As a shortcut you can use Makefile: 
+
+
+```
+make up NAME=<clustername> IPV4=<ip for the registry>
+```
+
+For GPU Support:
+```
+k3d cluster create gputest24 --image=nuxion/k3s:v1.24.4-k3s1-cuda --gpus=all
+```
+
+```
+export KUBECONFIG="$(k3d kubeconfig write k3s-default)"
 ```
 
 # Google Cloud
@@ -55,6 +70,8 @@ export GOOGLE_APPLICATION_CREDENTIALS=${INFRA_SECRETS}/gce.json
 export TF_VAR_credentials_file_path=${GOOGLE_APPLICATION_CREDENTIALS}
 export TF_BUCKET="..."
 export TF_PREFIX="terraform/state/platform"
+
+export PROJECT_ID="<YOUR GCP PROJECT>"
 ```
 
 To create a key for a service account check:

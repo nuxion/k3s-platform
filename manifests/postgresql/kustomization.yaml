@@ -1,0 +1,7 @@
+secretGenerator:
+- name: postgres-pass
+  env:
+  - .env.secrets
+resources:
+  - pvc.yaml
+  - postgres.yaml
