@@ -48,7 +48,7 @@ resource "google_compute_instance" "k3s_main" {
     dnsname = "${var.server_name}.${var.dns_name}"
   }
 
-  metadata_startup_script =  "${file("${var.base_path}/scripts/gce_k3s_install.sh")}"
+  metadata_startup_script =  "${file("${var.base_path}/scripts/google/k3s_install.sh")}"
 
 
   service_account {

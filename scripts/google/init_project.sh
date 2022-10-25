@@ -25,7 +25,7 @@ google_apis(){
     done
 }
 
-# google_apis
+google_apis
 
 source "${BASE_PATH}/scripts/google/packer.sh"
 config_packer
@@ -35,4 +35,7 @@ config_postgres
 
 source "${BASE_PATH}/scripts/google/terraform.sh"
 config_terraform
+
+source "${BASE_PATH}/scripts/google/k3s-installer.sh"
+config_k3s_installer
 

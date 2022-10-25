@@ -24,6 +24,7 @@ The most important for us are:
 - roles/artifactregistry.reader (for platform)
 - roles/artifactregistry.writer (for platform, and ci/cd)
 - roles/artifactregistry.repoAdmin (for users)
+- roles/iam.serviceAccountTokenCreator (if impersonate is used)
 
 List services accounts (optional)
 ```
