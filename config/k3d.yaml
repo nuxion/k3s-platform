@@ -8,3 +8,6 @@ options:
       - arg: --no-deploy=traefik
         nodeFilters:
           - server:*
+      - arg: --secrets-encryption
+        nodeFilters:
+          - server:*

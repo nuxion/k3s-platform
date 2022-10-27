@@ -12,3 +12,5 @@ ensure_var()
         echo "${1} is ${!1}"
     fi
 }
+
+

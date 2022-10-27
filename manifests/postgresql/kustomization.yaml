@@ -4,4 +4,4 @@ secretGenerator:
   - .env.secrets
 resources:
   - pvc.yaml
-  - postgres.yaml
+  - standalone.yaml

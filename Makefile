@@ -1,14 +1,11 @@
 
 PROVIDER=gce
 NAME=default
-IPV4=192.168.1.150
+export IPV4=192.168.1.150
 
 up:
-	scripts/registry.sh ${IPV4}
-	k3d cluster create --config config/k3d.yaml --registry-config config/registries.yaml  -p "8089:80@loadbalancer"
-	kubectl apply -f manifests/nginx-ingress/deploy.yaml
-	kubectl apply -k manifests/postgresql/
-	kubectl apply -k manifests/pgadmin4/
+	./scripts/k3dup.sh
+
 
 destroy:
 	k3d cluster delete ${NAME} 
@@ -16,6 +13,9 @@ destroy:
 
 debug:
 	kubectl run -i --tty --rm debug --image=debian:11.5-slim --restart=Never -- bash
+
+run:
+	kubectl exec --stdin --tty ${POD} -- /bin/sh
 
 events:
 	kubectl get events --sort-by=.metadata.creationTimestamp
