@@ -1,7 +1,0 @@
-secretGenerator:
-- name: pgadmin-secrets
-  env:
-  - .env.secrets
-resources:
-  - pvc.yaml
-  - pgadmin.yaml
