@@ -1,0 +1,6 @@
+defaultRules:
+  rules:
+    etcd: false
+
+kubeEtcd:
+  enabled: false
