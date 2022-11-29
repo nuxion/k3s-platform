@@ -1,0 +1,62 @@
+apiVersion: kubernetes.dask.org/v1
+kind: DaskCluster
+metadata:
+  name: simple
+spec:
+  worker:
+    replicas: 2
+    spec:
+      containers:
+      - name: worker
+        image: "ghcr.io/dask/dask:2022.10.2-py3.8"
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          requests:
+            memory: "4Gi"
+          limits:
+            memory: "8Gi"
+        args:
+          - dask-worker
+          - --name
+          - $(DASK_WORKER_NAME)
+  scheduler:
+    spec:
+      containers:
+      - name: scheduler
+        image: "ghcr.io/dask/dask:2022.10.2-py3.8"
+        imagePullPolicy: "IfNotPresent"
+        args:
+          - dask-scheduler
+        ports:
+          - name: tcp-comm
+            containerPort: 8786
+            protocol: TCP
+          - name: http-dashboard
+            containerPort: 8787
+            protocol: TCP
+        readinessProbe:
+          httpGet:
+            port: http-dashboard
+            path: /health
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            port: http-dashboard
+            path: /health
+          initialDelaySeconds: 15
+          periodSeconds: 20
+    service:
+      type: NodePort
+      selector:
+        dask.org/cluster-name: simple
+        dask.org/component: scheduler
+      ports:
+      - name: tcp-comm
+        protocol: TCP
+        port: 8786
+        targetPort: "tcp-comm"
+      - name: http-dashboard
+        protocol: TCP
+        port: 8787
+        targetPort: "http-dashboard"

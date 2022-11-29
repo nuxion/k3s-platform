@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # https://cloud.google.com/iam/docs/understanding-roles#cloud-storage-roles
-BIND_ROLES=("roles/storage.objectAdmin")
+BIND_ROLES=("roles/storage.objectAdmin" "roles/artifactregistry.repoAdmin")
 
 config_k3s_installer(){
 

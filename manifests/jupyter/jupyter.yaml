@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter
+  labels:
+    app: jupyter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter
+  template:
+    metadata:
+      labels:
+        app: jupyter
+    spec:
+      containers:
+        - name: jupyter
+          image: jupyter/minimal-notebook:python-3.8.8
+          imagePullPolicy: "IfNotPresent"
+          command: ["jupyter", "lab"]
+          args: ["--ip=0.0.0.0", "--notebook-dir=/workarea"]
+          ports:
+            - containerPort: 8888
+              name: jupyter-port
+          volumeMounts:
+            - name: lab-storage
+              mountPath: /workarea
+      volumes:
+        - name: lab-storage
+          persistentVolumeClaim:
+            claimName: lab-storage-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jupyter-svc
+  labels:
+    app: jupyter
+spec:
+  type: ClusterIP
+  ports:
+   - port: 8888
+     # nodePort: 30156
+     targetPort: jupyter-port
+  selector:
+   app: jupyter
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jupyter-ingress
+spec:
+  rules:
+    - host: lab.algorinfo.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name:  jupyter-svc
+                port:
+                  number: 80

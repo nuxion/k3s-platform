@@ -18,6 +18,9 @@ debug:
 run:
 	kubectl exec --stdin --tty ${POD} -- /bin/sh
 
+dask:
+	kubectl run -i --tty --rm dask-client  --overrides='{ "spec": { "serviceAccount": "dask-sa" }  }' --restart=Never --image=ghcr.io/dask/dask:2022.10.2-py3.8 -- /bin/bash
+
 events:
 	kubectl get events --sort-by=.metadata.creationTimestamp
 

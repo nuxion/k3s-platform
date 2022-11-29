@@ -53,17 +53,6 @@ spec:
             - "--requirepass"
           args: ["$(REDIS_PASSWORD)"]
           imagePullPolicy: "IfNotPresent"
-          # env:
-          #   - name: PGADMIN_DEFAULT_PASSWORD
-          #     valueFrom:
-          #       secretKeyRef:
-          #         name: pgadmin
-          #         key: password
-          #   - name: PGADMIN_DEFAULT_EMAIL
-          #     valueFrom:
-          #       secretKeyRef:
-          #         name: pgadmin
-          #         key: username
           env:
             - name: MASTER
               value: "true"

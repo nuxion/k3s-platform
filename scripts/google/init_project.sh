@@ -18,6 +18,7 @@ google_apis(){
         "dns"
         "storage"
         "artifactregistry"
+	"cloudbuild"
     )
     for api in ${APIS[@]}; do
         echo "... enabling ${api}.${apiurl}"
@@ -25,16 +26,16 @@ google_apis(){
     done
 }
 
-google_apis
+#google_apis
 
-source "${BASE_PATH}/scripts/google/packer.sh"
-config_packer
+#source "${BASE_PATH}/scripts/google/packer.sh"
+#config_packer
 
-source "${BASE_PATH}/scripts/google/postgres.sh"
-config_postgres
+#source "${BASE_PATH}/scripts/google/postgres.sh"
+#config_postgres
 
-source "${BASE_PATH}/scripts/google/terraform.sh"
-config_terraform
+#source "${BASE_PATH}/scripts/google/terraform.sh"
+#config_terraform
 
 source "${BASE_PATH}/scripts/google/k3s-installer.sh"
 config_k3s_installer

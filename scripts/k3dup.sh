@@ -27,6 +27,8 @@ kubectl apply -f manifests/nginx-ingress/deploy.yaml
 wait_kube ingress-nginx 1
 kubectl apply -f manifests/pg-operator/cnpg-1.17.1.yaml
 kubectl wait --for condition=established crd clusters.postgresql.cnpg.io
+kubectl wait --for condition=established crd poolers.postgresql.cnpg.io
+kubectl wait --for condition=established crd backups.postgresql.cnpg.io
 
 kubectl create namespace services
 kubectl label namespace/services purpose=services
