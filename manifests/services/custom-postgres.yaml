@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - image: nuxion/custom-postgres:14.5-0.1.0
+          name: postgresql
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: password
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+            - containerPort: 5432
+              name: postgres-svc
+          volumeMounts:
+            - name: pg-persistent-storage
+              mountPath: /var/lib/postgresql/data
+            - name: pgbackrest-conf-volume
+              mountPath: /etc/pgbackrest.conf
+              subPath: pgbackrest.conf
+            - name: pgbackrest-init-volume
+              mountPath: /docker-entrypoint-initdb.d/stanza.sh
+              subPath: stanza.sh
+      volumes:
+        - name: pg-persistent-storage
+          persistentVolumeClaim:
+            claimName: pg-path-pvc
+        - name: pgbackrest-conf-volume
+          configMap:
+            name: pgbackrest-config
+            items:
+              - key: config
+                path: pgbackrest.conf
+        - name: pgbackrest-init-volume
+          configMap:
+            name: pgbackrest-init
+            items:
+              - key: init
+                path: stanza.sh
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: pool
+                    operator: In
+                    values:
+                      - control-plane
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  type: ClusterIP
+  ports:
+   - port: 5432
+     targetPort: postgres-svc
+  selector:
+   app: postgres

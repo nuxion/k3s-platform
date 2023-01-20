@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  serviceName: redis
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - image: redis:7.0.5
+          name: redis
+          command:
+            - redis-server
+            - "--requirepass"
+          args: ["$(REDIS_PASSWORD)"]
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: MASTER
+              value: "true"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redisdata
+                  key: password
+          ports:
+            - containerPort: 6379
+              name: redis-svc
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: pool
+                    operator: In
+                    values:
+                      - control-plane
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  type: ClusterIP
+  ports:
+   - port: 6379
+     # nodePort: 30156
+     targetPort: redis-svc
+  selector:
+   app: redis

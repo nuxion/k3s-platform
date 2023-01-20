@@ -6,6 +6,8 @@ export IPV4=192.168.1.150
 up:
 	./scripts/k3dup.sh
 
+apply:
+	./scripts/apply.sh apply local
 
 destroy:
 	k3d cluster delete ${NAME} 

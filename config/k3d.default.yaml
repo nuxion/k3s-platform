@@ -11,3 +11,7 @@ options:
       - arg: --secrets-encryption
         nodeFilters:
           - server:*
+    nodeLabels:
+      - label: pool=control-plane
+        nodeFilters:
+          - server:*
