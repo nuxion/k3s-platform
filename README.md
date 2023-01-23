@@ -1,6 +1,8 @@
 # K3s platform
 
-Used for testing and prototyping
+Used for testing and prototyping. 
+
+This try to be a common platform used for different purposes. 
 
 ## Working locally (aka localhost)
 
