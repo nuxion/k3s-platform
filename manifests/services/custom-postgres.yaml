@@ -16,9 +16,10 @@ spec:
         app: postgres
     spec:
       containers:
-        - image: nuxion/custom-postgres:14.5-0.1.0
+        - image: nuxion/custom-postgres:14.5-0.1.2
           name: postgresql
           imagePullPolicy: "IfNotPresent"
+          command: ["/usr/local/bin/docker-entrypoint.sh", "postgres",  "-c", "config_file=/etc/postgresql/postgresql.conf"]
           env:
             - name: POSTGRES_PASSWORD
               valueFrom:
@@ -39,6 +40,12 @@ spec:
             - name: pgbackrest-init-volume
               mountPath: /docker-entrypoint-initdb.d/stanza.sh
               subPath: stanza.sh
+            - name: pg-config
+              mountPath: /etc/postgresql/postgresql.conf
+              subPath: postgresql.conf
+            - name: secrets
+              mountPath: "/secrets"
+              readOnly: true
       volumes:
         - name: pg-persistent-storage
           persistentVolumeClaim:
@@ -49,12 +56,24 @@ spec:
             items:
               - key: config
                 path: pgbackrest.conf
+        - name: pg-config
+          configMap:
+            name: postgres-config
+            items:
+              - key: conf
+                path: postgresql.conf
         - name: pgbackrest-init-volume
           configMap:
             name: pgbackrest-init
             items:
               - key: init
                 path: stanza.sh
+        - name: secrets
+          secret:
+            secretName: pg-secrets-files
+            items:
+              - key: sakey
+                path: key.json
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

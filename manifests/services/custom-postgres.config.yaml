@@ -5,7 +5,7 @@ metadata:
 data:
   config: |
     [${PG_STANZA_NAME}]
-    pg1-path=/var/lib/postgresql/data
+    pg1-path=/var/lib/postgresql/data/pgdata
 
     [global]
     repo1-type=gcs
@@ -27,3 +27,17 @@ data:
     #!/bin/bash
     set -e
     pgbackrest --stanza=${PG_STANZA_NAME} --log-level-console=info stanza-create
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+data:
+  conf: |
+    listen_addresses = '*'
+    archive_mode = on
+    archive_command = 'pgbackrest --stanza=main archive-push %p'
+    archive_timeout = 300
+    max_wal_senders = 10		
+    max_replication_slots = 10
+
