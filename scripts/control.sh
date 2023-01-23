@@ -9,19 +9,27 @@ export PGADMIN_PASS=`echo -n $PGADMIN_PASS_PLAIN | base64`
 source ./scripts/common.sh
 CMD="${1:-apply}"
 PLATFORM="${2:-local}"
+NS="services"
 
 
 general_apply(){
-    apply redis ${PLATFORM} services
+    apply redis ${PLATFORM} ${NS}
     # apply postgres ${PLATFORM} services
-    apply custom-postgres ${PLATFORM} services
-    # apply pgadmin ${PLATFORM} services
+    apply custom-postgres ${PLATFORM} ${NS}
+    apply pgadmin ${PLATFORM} ${NS}
+}
+
+general_delete(){
+    delete redis ${PLATFORM} ${NS}
+    # apply postgres ${PLATFORM} services
+    delete custom-postgres ${PLATFORM} ${NS}
+    # delete pgadmin ${PLATFORM} services
 }
 
 case $CMD in
     apply)
         # kubectl apply -f manifests/storage/storage.${PLATFORM}.yaml
-        kubectl apply -f manifests/services/ns.yaml
+        kubectl apply -f manifests/${NS}/ns.yaml
         general_apply
         ;;
 

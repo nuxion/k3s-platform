@@ -9,7 +9,7 @@ ensure_var IPV4
 
 run_registry $IPV4
 
-k3d cluster create --config config/k3d.${CLUSTER_NAME}.yaml --registry-config config/registries.yaml  -p "8089:80@loadbalancer"
+k3d cluster create --config config/k3d.${CLUSTER_NAME}.yaml  --registry-create registry.local  --registry-config config/registries.yaml  -p "8089:80@loadbalancer"
 
 kubectl apply -f manifests/nginx-ingress/deploy.yaml
 wait_kube ingress-nginx 1

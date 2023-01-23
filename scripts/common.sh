@@ -20,9 +20,9 @@ apply(){
 
     echo "==> applying ${SERVICE}"
 
-    if [ -f "manifests/${NS}/${SERVICE}.sh" ];
+    if [ -f "manifests/${NS}/${SERVICE}.apply.sh" ];
     then
-        ./manifests/${NS}/${SERVICE}.sh $NS
+        ./manifests/${NS}/${SERVICE}.apply.sh $NS
 
     fi
 
@@ -54,8 +54,19 @@ delete(){
 
     if [ -f "manifests/${NS}/${SERVICE}.secrets.yaml" ];
     then
-        kubectl delete -f manifests/${NS}/${SERVICE}.secrets.yaml
+        kubectl delete -n ${NS} -f manifests/${NS}/${SERVICE}.secrets.yaml
     fi
+    if [ -f "manifests/${NS}/${SERVICE}.config.yaml" ];
+    then
+        kubectl delete -n ${NS} -f manifests/${NS}/${SERVICE}.config.yaml  
+    fi
+
+    if [ -f "manifests/${NS}/${SERVICE}.delete.sh" ];
+    then
+        ./manifests/${NS}/${SERVICE}.delete.sh $NS
+
+    fi
+
     # pvc volumes aren't destroyed
     if [ -f "manifests/${NS}/${SERVICE}.pvc.${PLATFORM}.yaml" ];
     then

@@ -7,7 +7,10 @@ up:
 	./scripts/k3dup.sh
 
 apply:
-	./scripts/apply.sh apply local
+	./scripts/control.sh apply local
+
+delete:
+	./scripts/control.sh delete local
 
 destroy:
 	k3d cluster delete ${NAME} 
@@ -38,10 +41,14 @@ redis:
 grafana:
 	kubectl port-forward svc/prometheus-grafana 8080:80 -n prom
 
+pgadmin:
+	kubectl port-forward svc/pgadmin 8080:80 -n services
+
 build-client:
 	docker build . -t nuxion/k8-client:latest -f dockerfiles/Dockerfile.k8-client
 
 client:
 	./scripts/k3dclient.sh ${NAME}
 
-
+postgres-check:
+	kubectl exec -n services --stdin --tty ${POD} --  su - postgres -c "pgbackrest --stanza=main --log-level-console=info check"
